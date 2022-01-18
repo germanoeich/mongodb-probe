@@ -62,6 +62,11 @@ func check() {
 
 		if err != nil {
 			logrus.Error(err)
+			ErrorCounter.Inc()
+			StatusGauge.With(map[string]string{
+				"node": node,
+			}).Set(-1)
+			continue
 		}
 
 		var myOptime *primitive.Timestamp
