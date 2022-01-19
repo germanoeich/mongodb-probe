@@ -69,22 +69,22 @@ func check() {
 			continue
 		}
 
-		var myOptime *primitive.Timestamp
-		var primaryOptime *primitive.Timestamp
+		var myOptime int64
+		var primaryOptime int64
 
 		for _, e := range replStatus.Members {
 			if e.Self && e.Optime.Timestamp != nil {
-				myOptime = e.Optime.Timestamp
+				myOptime = int64(e.Optime.Timestamp.T)
 			}
 
 			if e.State == 1 && e.Optime.Timestamp != nil{
-				primaryOptime = e.Optime.Timestamp
+				primaryOptime = int64(e.Optime.Timestamp.T)
 			}
 		}
 
-		var lag float64 = -1
-		if myOptime != nil && primaryOptime != nil {
-			lag = float64(primaryOptime.T - myOptime.T)
+		var lag float64 = -10
+		if myOptime != 0 && primaryOptime != 0 {
+			lag = float64(myOptime - primaryOptime)
 		}
 
 		ReplicationLagGauge.With(map[string]string{
@@ -98,7 +98,7 @@ func check() {
 }
 
 func tick() {
-	t := time.NewTicker(1 * time.Minute)
+	t := time.NewTicker(30 * time.Second)
 
 	for range t.C {
 		check()
