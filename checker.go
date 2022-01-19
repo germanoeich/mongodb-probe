@@ -43,8 +43,8 @@ func check() {
 
 		opts := options.Client().ApplyURI(uri).SetDirect(true)
 
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+
 		client, err := mongo.Connect(ctx, opts)
 		if err != nil {
 			logrus.Error(err)
@@ -94,6 +94,9 @@ func check() {
 		StatusGauge.With(map[string]string{
 			"node": node,
 		}).Set(float64(replStatus.MyState))
+
+		client.Disconnect(ctx)
+		cancel()
 	}
 }
 
